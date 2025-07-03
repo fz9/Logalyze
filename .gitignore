@@ -39,6 +39,7 @@ Thumbs.db
 uploads/apache/error/*.log
 uploads/apache/access/*.log
 uploads/modsec/*.log
+!uploads/.gitkeep
 !uploads/apache/error/.gitkeep
 !uploads/apache/access/.gitkeep
 !uploads/modsec/.gitkeep
