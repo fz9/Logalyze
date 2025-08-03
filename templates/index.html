@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Log Viewer Dashboard</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <style>
+      .landing-container {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(
+          135deg,
+          hsl(var(--background)) 0%,
+          hsl(var(--muted)) 100%
+        );
+        padding: 2rem;
+      }
+
+      .landing-header {
+        text-align: center;
+        margin-bottom: 3rem;
+      }
+
+      .landing-title {
+        font-size: 3rem;
+        font-weight: 700;
+        color: hsl(var(--foreground));
+        margin-bottom: 0.5rem;
+      }
+
+      .landing-subtitle {
+        font-size: 1.2rem;
+        color: hsl(var(--muted-foreground));
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      .cards-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        max-width: 800px;
+        width: 100%;
+      }
+
+      .viewer-card {
+        background: hsl(var(--card));
+        border: 1px solid hsl(var(--border));
+        border-radius: var(--radius);
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+      }
+
+      .viewer-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        border-color: hsl(var(--primary));
+      }
+
+      .card-icon {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 1.5rem;
+        color: hsl(var(--primary));
+      }
+
+      .card-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: hsl(var(--foreground));
+        margin-bottom: 0.75rem;
+      }
+
+      .card-description {
+        color: hsl(var(--muted-foreground));
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+      }
+
+      .card-features {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        text-align: left;
+      }
+
+      .card-features li {
+        color: hsl(var(--muted-foreground));
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+      }
+
+      .card-features li::before {
+        content: "✓";
+        color: hsl(var(--primary));
+        font-weight: bold;
+        margin-right: 0.5rem;
+      }
+
+      .theme-toggle-landing {
+        position: fixed;
+        top: 2rem;
+        right: 2rem;
+        background: hsl(var(--card));
+        border: 1px solid hsl(var(--border));
+        border-radius: var(--radius);
+        padding: 0.75rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .theme-toggle-landing:hover {
+        background: hsl(var(--muted));
+      }
+
+      .theme-icon {
+        width: 20px;
+        height: 20px;
+        color: hsl(var(--foreground));
+      }
+
+      .theme-icon-dark {
+        display: none;
+      }
+
+      [data-theme="dark"] .theme-icon-light {
+        display: none;
+      }
+
+      [data-theme="dark"] .theme-icon-dark {
+        display: block;
+      }
+
+      @media (max-width: 768px) {
+        .landing-title {
+          font-size: 2rem;
+        }
+
+        .cards-container {
+          grid-template-columns: 1fr;
+          gap: 1.5rem;
+        }
+
+        .viewer-card {
+          padding: 1.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <button class="theme-toggle-landing" id="themeToggle">
+      <svg
+        class="theme-icon theme-icon-light"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+      >
+        <circle cx="12" cy="12" r="5" />
+        <line x1="12" y1="1" x2="12" y2="3" />
+        <line x1="12" y1="21" x2="12" y2="23" />
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+        <line x1="1" y1="12" x2="3" y2="12" />
+        <line x1="21" y1="12" x2="23" y2="12" />
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+      </svg>
+      <svg
+        class="theme-icon theme-icon-dark"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+      >
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </svg>
+    </button>
+
+    <div class="landing-container">
+      <div class="landing-header">
+        <h1 class="landing-title">Log Viewer Dashboard</h1>
+        <p class="landing-subtitle">
+          Choose your log analysis tool. Monitor and analyze security logs with
+          powerful dashboards, advanced filtering, and real-time insights.
+        </p>
+      </div>
+
+      <div class="cards-container">
+        <a href="/modsecurity" class="viewer-card">
+          <svg
+            class="card-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+            />
+          </svg>
+          <h2 class="card-title">ModSecurity Logs</h2>
+          <p class="card-description">
+            Analyze ModSecurity audit logs to monitor web application security
+            events, rule violations, and attack patterns.
+          </p>
+          <ul class="card-features">
+            <li>Real-time security event monitoring</li>
+            <li>Top source IPs and attack patterns</li>
+            <li>HTTP status code analysis</li>
+            <li>Advanced filtering and search</li>
+            <li>Interactive dashboards and charts</li>
+          </ul>
+        </a>
+
+        <a href="/apache-error" class="viewer-card">
+          <svg
+            class="card-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.664-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z"
+            />
+          </svg>
+          <h2 class="card-title">Apache Error Logs</h2>
+          <p class="card-description">
+            Monitor Apache server error logs to identify issues, track error
+            severity levels, and analyze server performance problems.
+          </p>
+          <ul class="card-features">
+            <li>Error severity level distribution</li>
+            <li>Module-specific error tracking</li>
+            <li>Timeline-based error analysis</li>
+            <li>Client IP and PID monitoring</li>
+            <li>Full-text error message search</li>
+          </ul>
+        </a>
+      </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/index.js') }}"></script>
+  </body>
+</html>

@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ModSecurity Log Viewer</title>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"
+      integrity="sha384-dug+JxfBvklEQdJ4AYuBBAIScUz0bVN73xpy273gcAwHjb3qI0fXmuYNaNfdyYJG"
+      crossorigin="anonymous"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+  <body>
+    <div class="app-layout">
+      <!-- Sidebar Overlay for Mobile -->
+      <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+      <!-- Sidebar Navigation -->
+      <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <div class="app-logo">
+            <svg
+              class="logo-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+            <span class="app-title">ModSecurity Logs</span>
+          </div>
+          <button class="sidebar-toggle" id="sidebarToggle">
+            <svg
+              class="toggle-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 18l-6-6 6-6"
+              />
+            </svg>
+          </button>
+        </div>
+
+        <nav class="sidebar-nav">
+          <div class="nav-section">
+            <div class="nav-section-title">MONITORING</div>
+            <a
+              href="/modsecurity"
+              class="nav-item active"
+              data-tooltip="ModSecurity Logs"
+            >
+              <svg
+                class="nav-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                />
+              </svg>
+              <span class="nav-text">ModSecurity Logs</span>
+            </a>
+            <a
+              href="/apache-error"
+              class="nav-item"
+              data-tooltip="Apache Error Logs"
+            >
+              <svg
+                class="nav-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.664-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z"
+                />
+              </svg>
+              <span class="nav-text">Apache Error Logs</span>
+            </a>
+          </div>
+          <div class="nav-section">
+            <div class="nav-section-title">TOOLS</div>
+            <a href="/" class="nav-item" data-tooltip="Back to Home">
+              <svg
+                class="nav-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                />
+              </svg>
+              <span class="nav-text">Home</span>
+            </a>
+          </div>
+        </nav>
+
+        <div class="sidebar-footer">
+          <button
+            class="theme-toggle"
+            id="themeToggle"
+            data-tooltip="Switch to Dark Mode"
+          >
+            <svg
+              class="theme-icon theme-icon-light"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+            >
+              <circle cx="12" cy="12" r="5" />
+              <line x1="12" y1="1" x2="12" y2="3" />
+              <line x1="12" y1="21" x2="12" y2="23" />
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+              <line x1="1" y1="12" x2="3" y2="12" />
+              <line x1="21" y1="12" x2="23" y2="12" />
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+            </svg>
+            <svg
+              class="theme-icon theme-icon-dark"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+            >
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+            <span class="theme-text">Light Mode</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Content Area -->
+      <div class="main-content">
+        <div class="content-header">
+          <div class="header-left">
+            <button class="mobile-menu-button" id="mobileMenuButton">
+              <div class="mobile-menu-icon">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </button>
+            <div>
+              <h1 class="page-title">ModSecurity Log Viewer</h1>
+              <p class="page-subtitle">
+                Monitor and analyze ModSecurity audit logs
+              </p>
+            </div>
+          </div>
+          <div class="header-right">
+            <div class="file-upload-section">
+              <label for="fileUpload" class="upload-button">
+                <svg
+                  class="upload-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                  />
+                </svg>
+                Upload
+              </label>
+              <input
+                type="file"
+                id="fileUpload"
+                accept=".log,.txt"
+                style="display: none"
+              />
+            </div>
+            <div class="file-selector">
+              <label class="file-label">Current File:</label>
+              <select id="fileSelect" class="file-select">
+                <option value="modsec_audit.log">
+                  modsec_audit.log (default)
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-body">
+          <!-- Dashboard Section -->
+          <div class="dashboard" id="dashboard">
+            <div class="dashboard-grid">
+              <div class="dashboard-card">
+                <h3 class="dashboard-card-title">Top 10 Source IPs</h3>
+                <div class="chart-container">
+                  <canvas id="ipChart"></canvas>
+                </div>
+              </div>
+              <div class="dashboard-card">
+                <h3 class="dashboard-card-title">Status Codes Over Time</h3>
+                <div class="chart-container">
+                  <canvas id="statusChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Filter Section -->
+          <div class="filter-section" id="filterSection" style="display: none">
+            <div style="display: flex; gap: 1rem; align-items: stretch">
+              <!-- Records Info Card (1/4) -->
+              <div class="filter-card" style="flex: 0 0 25%; min-width: 200px">
+                <div class="filter-content">
+                  <div
+                    style="
+                      display: flex;
+                      gap: 0.75rem;
+                      align-items: center;
+                      justify-content: center;
+                    "
+                  >
+                    <!-- Total Records Badge -->
+                    <div
+                      style="
+                        background: hsl(var(--muted));
+                        color: hsl(var(--muted-foreground));
+                        padding: 0.5rem 0.75rem;
+                        border-radius: calc(var(--radius) - 1px);
+                        border: 1px solid hsl(var(--border));
+                        text-align: center;
+                        min-width: 80px;
+                      "
+                    >
+                      <div
+                        style="
+                          font-size: 0.75rem;
+                          font-weight: 500;
+                          opacity: 0.8;
+                          margin-bottom: 0.125rem;
+                        "
+                      >
+                        TOTAL
+                      </div>
+                      <div
+                        id="totalRecords"
+                        style="
+                          font-size: 1.125rem;
+                          font-weight: 600;
+                          line-height: 1;
+                        "
+                      >
+                        0
+                      </div>
+                    </div>
+
+                    <!-- Filtered Records Badge -->
+                    <div
+                      style="
+                        background: hsl(var(--secondary));
+                        color: hsl(var(--secondary-foreground));
+                        padding: 0.5rem 0.75rem;
+                        border-radius: calc(var(--radius) - 1px);
+                        border: 1px solid hsl(var(--border));
+                        text-align: center;
+                        min-width: 80px;
+                      "
+                    >
+                      <div
+                        style="
+                          font-size: 0.75rem;
+                          font-weight: 500;
+                          opacity: 0.8;
+                          margin-bottom: 0.125rem;
+                        "
+                      >
+                        FILTERED
+                      </div>
+                      <div
+                        id="filteredRecords"
+                        style="
+                          font-size: 1.125rem;
+                          font-weight: 600;
+                          line-height: 1;
+                        "
+                      >
+                        0
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Time Range Filter Card (3/4) -->
+              <div class="filter-card" style="flex: 1">
+                <div class="filter-content">
+                  <h3 class="filter-title" style="margin: 0 0 0.75rem 0">
+                    <svg
+                      class="filter-icon"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707v4.586l-4 2v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+                      ></path>
+                    </svg>
+                    Time Range Filter
+                  </h3>
+
+                  <div
+                    class="timestamp-slider-container"
+                    id="timestampSliderContainer"
+                    style="display: none"
+                  >
+                    <div class="slider-wrapper">
+                      <div class="slider-track"></div>
+                      <div class="slider-range" id="sliderRange"></div>
+                      <input
+                        type="range"
+                        class="range-input"
+                        id="startRange"
+                        min="0"
+                        max="100"
+                        value="0"
+                        step="1"
+                      />
+                      <input
+                        type="range"
+                        class="range-input"
+                        id="endRange"
+                        min="0"
+                        max="100"
+                        value="100"
+                        step="1"
+                      />
+                    </div>
+                  </div>
+
+                  <div
+                    style="
+                      display: flex;
+                      justify-content: space-between;
+                      align-items: center;
+                      margin-top: 0.5rem;
+                    "
+                  >
+                    <div
+                      class="slider-values"
+                      id="sliderValues"
+                      style="display: none; gap: 0.5rem"
+                    >
+                      <span id="startValue">-</span>
+                      <span id="endValue">-</span>
+                    </div>
+
+                    <button
+                      id="resetTimeFilter"
+                      style="
+                        background: none;
+                        border: 1px solid hsl(var(--border));
+                        border-radius: calc(var(--radius) - 2px);
+                        padding: 0.25rem 0.75rem;
+                        font-size: 0.75rem;
+                        color: hsl(var(--muted-foreground));
+                        cursor: pointer;
+                        transition: all 0.2s ease;
+                        display: none;
+                      "
+                    >
+                      Reset
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="table-container">
+            <table class="table" id="log-table">
+              <thead>
+                <tr>
+                  <th class="id-cell">
+                    <div class="header-content">
+                      <div
+                        class="header-label sortable-header"
+                        data-column="id"
+                      >
+                        <span>Transaction ID</span>
+                        <span class="sort-icon">↕</span>
+                      </div>
+                      <input
+                        type="text"
+                        class="input column-input"
+                        placeholder="Filter ID..."
+                        data-column="id"
+                      />
+                    </div>
+                  </th>
+                  <th class="timestamp-cell">
+                    <div class="header-content">
+                      <div
+                        class="header-label sortable-header"
+                        data-column="timestamp"
+                      >
+                        <span>Timestamp</span>
+                        <span class="sort-icon">↕</span>
+                      </div>
+                      <input
+                        type="text"
+                        class="input column-input"
+                        placeholder="Filter timestamp..."
+                        data-column="timestamp"
+                      />
+                    </div>
+                  </th>
+                  <th class="ip-cell">
+                    <div class="header-content">
+                      <div
+                        class="header-label sortable-header"
+                        data-column="source_ip"
+                      >
+                        <span>Source IP</span>
+                        <span class="sort-icon">↕</span>
+                      </div>
+                      <input
+                        type="text"
+                        class="input column-input"
+                        placeholder="Filter IP..."
+                        data-column="source_ip"
+                      />
+                    </div>
+                  </th>
+                  <th class="port-cell">
+                    <div class="header-content">
+                      <div
+                        class="header-label sortable-header"
+                        data-column="source_port"
+                      >
+                        <span>Src Port</span>
+                        <span class="sort-icon">↕</span>
+                      </div>
+                      <input
+                        type="text"
+                        class="input column-input"
+                        placeholder="Port..."
+                        data-column="source_port"
+                      />
+                    </div>
+                  </th>
+                  <th class="dest-port-cell">
+                    <div class="header-content">
+                      <div
+                        class="header-label sortable-header"
+                        data-column="destination_port"
+                      >
+                        <span>Dest Port</span>
+                        <span class="sort-icon">↕</span>
+                      </div>
+                      <input
+                        type="text"
+                        class="input column-input"
+                        placeholder="Port..."
+                        data-column="destination_port"
+                      />
+                    </div>
+                  </th>
+                  <th class="request-cell">
+                    <div class="header-content">
+                      <div
+                        class="header-label sortable-header"
+                        data-column="request_line"
+                      >
+                        <span>Request Line</span>
+                        <span class="sort-icon">↕</span>
+                      </div>
+                      <input
+                        type="text"
+                        class="input column-input"
+                        placeholder="Filter request..."
+                        data-column="request_line"
+                      />
+                    </div>
+                  </th>
+                  <th class="status-cell">
+                    <div class="header-content">
+                      <div
+                        class="header-label sortable-header"
+                        data-column="response_status"
+                      >
+                        <span>Status</span>
+                        <span class="sort-icon">↕</span>
+                      </div>
+                      <input
+                        type="text"
+                        class="input column-input"
+                        placeholder="Filter status..."
+                        data-column="response_status"
+                      />
+                    </div>
+                  </th>
+                  <th class="messages-cell">
+                    <div class="header-content">
+                      <div
+                        class="header-label sortable-header"
+                        data-column="messages"
+                      >
+                        <span>Messages</span>
+                        <span class="sort-icon">↕</span>
+                      </div>
+                      <input
+                        type="text"
+                        class="input column-input"
+                        placeholder="Filter messages..."
+                        data-column="messages"
+                      />
+                    </div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td colspan="8" class="loading">Loading logs...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Message Modal -->
+        <div class="modal-overlay" id="messageModal">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3 class="modal-title">Full Message Content</h3>
+              <button class="modal-close" onclick="closeMessageModal()">
+                &times;
+              </button>
+            </div>
+            <div class="modal-body" id="messageModalBody">
+              <!-- Message content will be inserted here -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Legend Context Menu -->
+        <div class="legend-context-menu" id="legendContextMenu">
+          <div class="context-menu-item" id="contextShowAllOption">
+            <span class="context-menu-icon">👁️</span>
+            <span>Show All</span>
+          </div>
+          <div class="context-menu-item" id="contextFilterOption">
+            <span class="context-menu-icon">🎯</span>
+            <span>Show Only This</span>
+          </div>
+          <div class="context-menu-item" id="contextHideOption">
+            <span class="context-menu-icon">🚫</span>
+            <span>Hide</span>
+          </div>
+          <div class="context-menu-item" id="contextShowOption">
+            <span class="context-menu-icon">✅</span>
+            <span>Show</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/modsecurity.js') }}"></script>
+  </body>
+</html>
